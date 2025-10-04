@@ -2,7 +2,7 @@ import 'master/product.dart';
 class SlipDetail {
   final int id;              // Database ID for the slip detail, 0 or null if new
   final Product? product;    // The associated product (can be null when not selected)
-  final int? quantity;
+  final double? quantity;
   final double? rate;
   final double? weight;
   final double? amount;
@@ -21,7 +21,7 @@ class SlipDetail {
   SlipDetail copyWith({
     int? id,
     Product? product,
-    int? quantity,
+    double? quantity,
     double? rate,
     double? weight,
     double? amount,

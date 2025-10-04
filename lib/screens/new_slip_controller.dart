@@ -27,7 +27,7 @@ class NewSlipController extends GetxController {
 
   // Section 3: summary values
   RxDouble totalWeight = 0.0.obs;
-  RxInt totalQuantity = 0.obs;
+  RxDouble totalQuantity = 0.0.obs;
   RxDouble totalAmount = 0.0.obs;
 
   // Loading and UI feedback
@@ -104,7 +104,7 @@ class NewSlipController extends GetxController {
 
   void calculateSummary() {
     double weightSum = 0;
-    int qtySum = 0;
+    double qtySum = 0;
     double amountSum = 0;
     for (var d in slipDetails) {
       weightSum += d.weight ?? 0;
@@ -129,13 +129,12 @@ class NewSlipController extends GetxController {
     calculateSummary();
   }
 
-  void onQuantityChanged(int index, int qty) {
-    var detail = slipDetails[index];
-    detail = detail.copyWith(quantity: qty);
-    slipDetails[index] = detail;
+  void onQuantityChanged(int index, double qty) {
+    slipDetails[index] = slipDetails[index].copyWith(quantity: qty);
     calculateLineAmount(index);
     calculateSummary();
   }
+
 
   void onRateChanged(int index, double rate) {
     var detail = slipDetails[index];
@@ -201,6 +200,7 @@ class NewSlipController extends GetxController {
         // Implement printer logic below
       }
     } catch (e) {
+      //debugPrint(e.toString());
       Get.snackbar('Error', 'Failed to save slip: $e', snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSaving.value = false;

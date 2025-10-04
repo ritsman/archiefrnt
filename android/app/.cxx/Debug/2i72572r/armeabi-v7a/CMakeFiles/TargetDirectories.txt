@@ -1,0 +1,2 @@
+/Users/riteshmangwani/Documents/software/flutterApps/archie/android/app/.cxx/Debug/2i72572r/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/riteshmangwani/Documents/software/flutterApps/archie/android/app/.cxx/Debug/2i72572r/armeabi-v7a/CMakeFiles/rebuild_cache.dir

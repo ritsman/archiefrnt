@@ -9,7 +9,7 @@ import 'package:data_table_2/data_table_2.dart';
 class SlipDetailsSection extends StatelessWidget {
   final NewSlipController controller;
 
-  SlipDetailsSection({required this.controller});
+  SlipDetailsSection({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -17,37 +17,35 @@ class SlipDetailsSection extends StatelessWidget {
       final details = controller.slipDetails;
       return Column(
         children: [
-          Expanded(
+          SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columnSpacing: 12,
-                  horizontalMargin: 12,
-                  columns: [
-                    DataColumn(label: Text('Product')),
-                    DataColumn(label: Text('Quantity')),
-                    DataColumn(label: Text('Rate')),
-                    DataColumn(label: Text('Weight')),
-                    DataColumn(label: Text('Amount')),
-                    DataColumn(label: Text('Actions')),
-                  ],
-                  rows: List.generate(details.length, (index) {
-                    final detail = details[index];
-                    return DataRow(cells: [
-                      DataCell(_buildProductDropdown(index, detail)),
-                      DataCell(_buildQuantityField(index, detail)),
-                      DataCell(_buildRateField(index, detail)),
-                      DataCell(Text((detail.weight ?? 0).toStringAsFixed(2))),
-                      DataCell(Text((detail.amount ?? 0).toStringAsFixed(2))),
-                      DataCell(IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => controller.deleteSlipDetail(index),
-                      )),
-                    ]);
-                  }),
-                ),
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 12,
+                horizontalMargin: 12,
+                columns: [
+                  DataColumn(label: Text('Product')),
+                  DataColumn(label: Text('Quantity')),
+                  DataColumn(label: Text('Rate')),
+                  DataColumn(label: Text('Weight')),
+                  DataColumn(label: Text('Amount')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: List.generate(details.length, (index) {
+                  final detail = details[index];
+                  return DataRow(cells: [
+                    DataCell(_buildProductDropdown(index, detail)),
+                    DataCell(_buildQuantityField(index, detail)),
+                    DataCell(_buildRateField(index, detail)),
+                    DataCell(Text((detail.weight ?? 0).toStringAsFixed(2))),
+                    DataCell(Text((detail.amount ?? 0).toStringAsFixed(2))),
+                    DataCell(IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => controller.deleteSlipDetail(index),
+                    )),
+                  ]);
+                }),
               ),
             ),
           ),
@@ -84,10 +82,10 @@ class SlipDetailsSection extends StatelessWidget {
     return SizedBox(
       width: 70,
       child: TextField(
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         controller: qtyController,
         onChanged: (val) {
-          int qty = int.tryParse(val) ?? 0;
+          double qty = double.tryParse(val) ?? 0;
           controller.onQuantityChanged(index, qty);
         },
         decoration: InputDecoration(border: OutlineInputBorder()),

@@ -8,32 +8,36 @@ import 'master/salesman.dart';
 class NewSlipPage extends StatelessWidget {
   final NewSlipController controller = Get.put(NewSlipController());
 
+   NewSlipPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset:true,
       appBar: AppBar(title: Text('New Slip')),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+        child: SingleChildScrollView(
+            padding: EdgeInsets.all(12),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+          
+                  // Section 1: Main Data Input
+                  _buildMainDataSection(),
+          
+                  SizedBox(height: 12),
+          
+                  // Section 2: Slip Details Scrollable Table
+                  SizedBox(height:300,child: SlipDetailsSection(controller: controller)),
+          
+                  SizedBox(height: 12),
+          
+                  // Section 3: Summary + Buttons
+                  _buildSummarySection(),
+                ],
 
-                // Section 1: Main Data Input
-                _buildMainDataSection(),
-
-                SizedBox(height: 12),
-
-                // Section 2: Slip Details Scrollable Table
-                Expanded(child: SlipDetailsSection(controller: controller)),
-
-                SizedBox(height: 12),
-
-                // Section 3: Summary + Buttons
-                _buildSummarySection(),
-              ],
-            ),
-
+          
+          ),
         ),
       ),
     );
@@ -161,7 +165,7 @@ class NewSlipPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Obx(() => ElevatedButton(
-              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(print: false),
+              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(print: true),
               child: Text('Save'),
             )),
             Obx(() => ElevatedButton(
