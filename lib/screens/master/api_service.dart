@@ -11,8 +11,8 @@ import '../payments/payments.dart'; // Make sure you have Payment + ClientMini c
 
 class ApiService {
   //static const String baseUrl = 'http://192.168.29.132:8000'; // Replace with your FastAPI IP
-  //static const String baseUrl = 'http://103.73.190.204:8000';
-  static const String baseUrl = 'http://192.168.29.237:8000';
+  static const String baseUrl = 'http://103.73.190.204:8000';
+  //static const String baseUrl = 'http://192.168.29.237:8000';
 //master/salesman
   static Future<List<Salesman>> fetchSalesmen() async {
     final response = await http.get(Uri.parse('$baseUrl/salesmen/'));
@@ -166,17 +166,23 @@ class ApiService {
 
   // Create a new slip (and its slip details)
   static Future<Slip> createSlip(Slip slip) async {
-    //print(jsonEncode(slip.toJson()));
+    print("---------");
+    print(jsonEncode(slip.toJson()));
     final response = await http.post(
       Uri.parse('$baseUrl/slips/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(
           slip.toJson()), // Slip contains nested slipDetails in toJson
     );
+    print("ppppppp2");
+    print(Slip.fromJson(jsonDecode(response.body)));
     if (response.statusCode == 200) {
+      print(response.body);
+      print(response.statusCode);
+      print(Slip.fromJson(jsonDecode(response.body)));
       return Slip.fromJson(jsonDecode(response.body));
     }
-    //print(slip);
+    print(slip);
     throw Exception('Failed to create slip2:$slip');
   }
 

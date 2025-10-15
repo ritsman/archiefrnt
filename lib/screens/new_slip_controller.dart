@@ -1,63 +1,92 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'master/client.dart';    // your client model
-import 'master/salesman.dart'; // your salesman model
-import 'master/product.dart';  // your product model
+import 'master/client.dart';
+import 'master/salesman.dart';
+import 'master/product.dart';
 import 'slip.dart';
-import 'slip_details.dart'; // model for slip detail item
-import 'master/api_service.dart';     // your API service
+import 'slip_details.dart';
+import 'master/api_service.dart';
 
 class NewSlipController extends GetxController {
-  // Section 1 fields
+  // Section 1: Basic fields
   var slipDate = DateTime.now().obs;
   var slipNumber = ''.obs;
 
   var vehicleNumberController = TextEditingController();
   var vehicleNumberSuggestions = <String>[].obs;
 
-  // Clients & Salesmen list and selection
+  // NEW: Transport Charges
+  var transportCharges = 0.0.obs;
+  late TextEditingController transportChargesController;
+
+  // Clients, Salesmen, Products
   var clients = <Client>[].obs;
   var selectedClient = Rxn<Client>();
   var products = <Product>[].obs;
   var salesmen = <Salesman>[].obs;
   var selectedSalesman = Rxn<Salesman>();
 
-  // Section 2: slip details list
+  // Section 2: Slip details
   var slipDetails = <SlipDetail>[].obs;
+  var quantityControllers = <TextEditingController>[].obs;
+  var rateControllers = <TextEditingController>[].obs;
 
-  // Section 3: summary values
+  // Section 3: Summary values
   RxDouble totalWeight = 0.0.obs;
   RxDouble totalQuantity = 0.0.obs;
   RxDouble totalAmount = 0.0.obs;
 
-  // Loading and UI feedback
+  // Loading/UI feedback
   var isSaving = false.obs;
 
-  // Initialize lists of clients, salesmen, products, vehicle numbers, etc.
   @override
   void onInit() {
     super.onInit();
     fetchInitialData();
+    initializeControllers();
 
     vehicleNumberController.addListener(() {
       filterVehicleNumberSuggestions(vehicleNumberController.text);
     });
+
+    // Initialize transport controller
+    transportChargesController = TextEditingController();
+  }
+
+  @override
+  void onClose() {
+    vehicleNumberController.dispose();
+    transportChargesController.dispose();
+    for (var c in quantityControllers) {
+      c.dispose();
+    }
+    for (var c in rateControllers) {
+      c.dispose();
+    }
+    super.onClose();
+  }
+
+  void initializeControllers() {
+    quantityControllers.clear();
+    rateControllers.clear();
+    for (var slip in slipDetails) {
+      quantityControllers.add(
+          TextEditingController(text: slip.quantity?.toString() ?? ''));
+      rateControllers
+          .add(TextEditingController(text: slip.rate?.toString() ?? ''));
+    }
   }
 
   Future<void> fetchInitialData() async {
     try {
-      // Fetch clients, salesmen etc. from your API
       clients.assignAll(await ApiService.fetchClients());
       salesmen.assignAll(await ApiService.fetchSalesmen());
       products.assignAll(await ApiService.fetchProducts());
-
-      // For vehicle numbers, gather the unique numbers from previous slips or elsewhere
       vehicleNumberSuggestions.assignAll(await ApiService.fetchVehicleNumbers());
-
-      // Generate slip number for today (can also be updated by user if needed)
       slipNumber.value = await ApiService.generateSlipNumber(slipDate.value);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load initial data: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Error', 'Failed to load initial data: $e',
+          snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -78,8 +107,7 @@ class NewSlipController extends GetxController {
     slipNumber.value = await ApiService.generateSlipNumber(newDate);
   }
 
-  // Section 2: Add, update, delete slip detail item
-
+  // Slip details handling
   void addNewSlipDetail() {
     slipDetails.add(SlipDetail(
       id: 0,
@@ -89,6 +117,8 @@ class NewSlipController extends GetxController {
       weight: 0.0,
       amount: 0.0,
     ));
+    quantityControllers.add(TextEditingController(text: '1'));
+    rateControllers.add(TextEditingController(text: '0.0'));
     calculateSummary();
   }
 
@@ -106,25 +136,25 @@ class NewSlipController extends GetxController {
     double weightSum = 0;
     double qtySum = 0;
     double amountSum = 0;
+
     for (var d in slipDetails) {
       weightSum += d.weight ?? 0;
       qtySum += d.quantity ?? 0;
       amountSum += d.amount ?? 0;
     }
+
     totalWeight.value = weightSum;
     totalQuantity.value = qtySum;
     totalAmount.value = amountSum;
   }
 
   void onProductSelected(int index, Product product) {
-    var detail = slipDetails[index];
-    // Update product, and fetch rate from DB (already have product.rate)
-    detail = detail.copyWith(
+    var detail = slipDetails[index].copyWith(
       product: product,
       rate: product.rate ?? 0,
-      // optionally reset quantity, weight, amount
     );
     slipDetails[index] = detail;
+    rateControllers[index].text = (product.rate ?? 0).toString();
     calculateLineAmount(index);
     calculateSummary();
   }
@@ -135,11 +165,8 @@ class NewSlipController extends GetxController {
     calculateSummary();
   }
 
-
   void onRateChanged(int index, double rate) {
-    var detail = slipDetails[index];
-    detail = detail.copyWith(rate: rate);
-    slipDetails[index] = detail;
+    slipDetails[index] = slipDetails[index].copyWith(rate: rate);
     calculateLineAmount(index);
     calculateSummary();
   }
@@ -151,24 +178,24 @@ class NewSlipController extends GetxController {
       weight = detail.product!.weight! * detail.quantity!;
     }
     double amount = (detail.rate ?? 0) * (detail.quantity ?? 0);
-
-    detail = detail.copyWith(weight: weight, amount: amount);
-    slipDetails[index] = detail;
+    slipDetails[index] = detail.copyWith(weight: weight, amount: amount);
   }
 
-  // Submit slip data
-
+  // Save Slip
   Future<void> saveSlip({bool print = false}) async {
     if (selectedClient.value == null) {
-      Get.snackbar('Validation Error', 'Please select a client', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Validation Error', 'Please select a client',
+          snackPosition: SnackPosition.BOTTOM);
       return;
     }
     if (selectedSalesman.value == null) {
-      Get.snackbar('Validation Error', 'Please select a salesman', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Validation Error', 'Please select a salesman',
+          snackPosition: SnackPosition.BOTTOM);
       return;
     }
     if (slipDetails.isEmpty) {
-      Get.snackbar('Validation Error', 'Please add at least one slip detail', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Validation Error', 'Please add at least one slip detail',
+          snackPosition: SnackPosition.BOTTOM);
       return;
     }
 
@@ -178,7 +205,7 @@ class NewSlipController extends GetxController {
       List<SlipDetail> slipDetailsWithDate = slipDetails.map((detail) {
         return detail.copyWith(slipDate: slipDate.value);
       }).toList();
-      // Build slip create object with nested details
+
       var slipCreate = Slip(
         id: 0,
         slipNumber: slipNumber.value,
@@ -186,31 +213,30 @@ class NewSlipController extends GetxController {
         salesmanId: selectedSalesman.value!.id,
         slipDate: slipDate.value,
         vehicleNumber: vehicleNumberController.text,
-        totalAmount: totalAmount.value,
+        transportCharges:transportCharges.value,
+        totalAmount: totalAmount.value , // ✅ include
         slipDetails: slipDetailsWithDate,
+        // optionally: add transportCharges in your Slip model if backend supports it
       );
 
-      // Save via API
       await ApiService.createSlip(slipCreate);
 
-      Get.snackbar('Success', 'Slip saved successfully', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Success', 'Slip saved successfully',
+          snackPosition: SnackPosition.BOTTOM);
 
       if (print) {
-        // Call your print function here, or open printer selection dialog
-        // Implement printer logic below
+        // implement printing here
       }
     } catch (e) {
-      //debugPrint(e.toString());
-      Get.snackbar('Error', 'Failed to save slip: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Error', 'Failed to save slip: $e',
+          snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSaving.value = false;
     }
   }
 
   Future<void> findAndSelectPrinter() async {
-    // Your printer discovery logic here
-    // Could open a modal dialog that allows user to scan/select printers
-    // For now just a placeholder
-    Get.snackbar('Info', 'Printer selection not implemented yet', snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar('Info', 'Printer selection not implemented yet',
+        snackPosition: SnackPosition.BOTTOM);
   }
 }

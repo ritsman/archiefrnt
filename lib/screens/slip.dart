@@ -31,6 +31,7 @@ class Slip {
   final DateTime slipDate;
   final String? vehicleNumber;
   final double totalAmount;
+  final double transportCharges;
   final List<SlipDetail> slipDetails;
   final ClientMini? client;
   final SalesmanMini? salesman;
@@ -44,6 +45,7 @@ class Slip {
     this.salesman,
     required this.slipDate,
     this.vehicleNumber,
+    required this.transportCharges,
     required this.totalAmount,
     required this.slipDetails,
   });
@@ -58,6 +60,7 @@ class Slip {
       salesman: json['salesman'] != null ? SalesmanMini.fromJson(json['salesman']) : null,
       slipDate: DateTime.parse(json['slip_date']),
       vehicleNumber: json['vehicle_number'],
+      transportCharges: json['transport_charges'],
       totalAmount: (json['total_amount'] as num).toDouble(),
       slipDetails: (json['slip_details'] as List<dynamic>)
           .map((e) => SlipDetail.fromJson(e))
@@ -73,6 +76,7 @@ class Slip {
       'salesman_id': salesmanId,
       'slip_date': slipDate.toIso8601String().substring(0, 10),
       'vehicle_number': vehicleNumber,
+      'transport_charges':transportCharges,
       'total_amount': totalAmount,
       'slip_details': slipDetails.map((detail) => detail.toJson()).toList(),
     };
@@ -86,6 +90,7 @@ class Slip {
     DateTime? slipDate,
     String? vehicleNumber,
     double? totalAmount,
+    double? transportCharges,
     List<SlipDetail>? slipDetails,
   }) {
     return Slip(
@@ -95,6 +100,7 @@ class Slip {
       salesmanId: salesmanId ?? this.salesmanId,
       slipDate: slipDate ?? this.slipDate,
       vehicleNumber: vehicleNumber ?? this.vehicleNumber,
+      transportCharges: transportCharges?? this.transportCharges,
       totalAmount: totalAmount ?? this.totalAmount,
       slipDetails: slipDetails ?? this.slipDetails,
     );

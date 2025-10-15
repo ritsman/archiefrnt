@@ -28,7 +28,7 @@ class NewSlipPage extends StatelessWidget {
                   SizedBox(height: 12),
           
                   // Section 2: Slip Details Scrollable Table
-                  SizedBox(height:300,child: SlipDetailsSection(controller: controller)),
+                  SlipDetailsSection(controller: controller),
           
                   SizedBox(height: 12),
           
@@ -67,15 +67,15 @@ class NewSlipPage extends StatelessWidget {
                   },
                   child: Text(
                     '${controller.slipDate.value.toLocal().toIso8601String().substring(0, 10)}',
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               )),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Obx(() => TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Slip Number',
                   border: OutlineInputBorder(),
                 ),
@@ -86,56 +86,64 @@ class NewSlipPage extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
         // Row 2: Client dropdown
         Obx(() => DropdownButtonFormField<Client>(
-          decoration: InputDecoration(labelText: 'Select Client', border: OutlineInputBorder()),
-          items: controller.clients.map((c) => DropdownMenuItem(value: c, child: Text(c.name))).toList(),
+          decoration: const InputDecoration(
+            labelText: 'Select Client',
+            border: OutlineInputBorder(),
+          ),
+          items: controller.clients
+              .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
+              .toList(),
           onChanged: (value) => controller.selectedClient.value = value,
           value: controller.selectedClient.value,
         )),
 
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
         // Row 3: Salesman dropdown
         Obx(() => DropdownButtonFormField<Salesman>(
-          decoration: InputDecoration(labelText: 'Select Salesman', border: OutlineInputBorder()),
-          items: controller.salesmen.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
+          decoration: const InputDecoration(
+            labelText: 'Select Salesman',
+            border: OutlineInputBorder(),
+          ),
+          items: controller.salesmen
+              .map((s) => DropdownMenuItem(value: s, child: Text(s.name)))
+              .toList(),
           onChanged: (value) => controller.selectedSalesman.value = value,
           value: controller.selectedSalesman.value,
         )),
 
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
-        // Row 4: Calculated weight (readonly) and vehicle number input with suggestions
+        // Row 4: Total weight, Vehicle number, and Transport charges
         Row(
           children: [
-            Expanded(
-              child: Obx(() => TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Total Weight',
-                  border: OutlineInputBorder(),
-                ),
-                readOnly: true,
-                controller: TextEditingController(text: controller.totalWeight.value.toStringAsFixed(2)),
-              )),
-            ),
-            SizedBox(width: 16),
+            // Total Weight
+
+
+
+            // Vehicle Number with Autocomplete
             Expanded(
               child: Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text == '') return const Iterable<String>.empty();
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<String>.empty();
+                  }
                   return controller.vehicleNumberSuggestions.where((String option) {
-                    return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                    return option
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
                   });
                 },
-                fieldViewBuilder: (context, controllerTextField, focusNode, onFieldSubmitted) {
-                  controller.vehicleNumberController = controllerTextField;
+                fieldViewBuilder: (context, textController, focusNode, onFieldSubmitted) {
+                  controller.vehicleNumberController = textController;
                   return TextFormField(
                     controller: controller.vehicleNumberController,
                     focusNode: focusNode,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Vehicle Number',
                       border: OutlineInputBorder(),
                     ),
@@ -145,6 +153,44 @@ class NewSlipPage extends StatelessWidget {
                   controller.vehicleNumberController.text = selection;
                 },
               ),
+            ),
+            const SizedBox(width: 16),
+
+            // Transport Charges
+            Expanded(
+              child: Obx(() => TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Transport Charges',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  final parsed = double.tryParse(val) ?? 0.0;
+                  controller.transportCharges.value = parsed;
+                },
+                controller: TextEditingController(
+                  text: controller.transportCharges.value == 0.0
+                      ? ''
+                      : controller.transportCharges.value.toStringAsFixed(2),
+                ),
+              )),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Obx(() => TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Total Weight',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true,
+                controller: TextEditingController(
+                  text: controller.totalWeight.value.toStringAsFixed(2),
+                ),
+              )),
             ),
           ],
         ),

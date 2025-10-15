@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Business App',
       theme: AppTheme.lightTheme,
-      initialRoute: '/login',
+      initialRoute: '/',
       getPages: [
         GetPage(name: '/', page: () => LoginScreen()),
         GetPage(name: '/home', page: () => HomeScreen()),
