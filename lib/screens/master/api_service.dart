@@ -11,8 +11,8 @@ import '../payments/payments.dart'; // Make sure you have Payment + ClientMini c
 
 class ApiService {
   //static const String baseUrl = 'http://192.168.29.132:8000'; // Replace with your FastAPI IP
-  //static const String baseUrl = 'http://103.73.190.204:8000';
-  static const String baseUrl = 'http://192.168.29.237:8000';
+  static const String baseUrl = 'http://103.73.190.204:8000';
+  //static const String baseUrl = 'http://192.168.29.237:8000';
 //master/salesman
   static Future<List<Salesman>> fetchSalesmen() async {
     final response = await http.get(Uri.parse('$baseUrl/salesmen/'));
