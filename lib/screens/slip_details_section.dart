@@ -99,22 +99,27 @@ class SlipDetailsSection extends StatelessWidget {
   }
 
   Widget _buildProductDropdown(int index, SlipDetail detail) {
-    return DropdownButton<Product>(
-      value: detail.product,
+    return DropdownButton<int>(
+      value: detail.product?.id, // use product ID
       hint: const Text('Select Product', style: TextStyle(fontSize: 14)),
-      items: controller.products.map((Product product) {
-        return DropdownMenuItem<Product>(
-          value: product,
+      items: controller.products.map((product) {
+        return DropdownMenuItem<int>(
+          value: product.id,
           child: Text(product.name, style: const TextStyle(fontSize: 14)),
         );
       }).toList(),
-      onChanged: (Product? selectedProduct) {
-        if (selectedProduct != null) {
+      onChanged: (int? selectedId) {
+        if (selectedId != null) {
+          // find the actual product instance from controller.products
+          final selectedProduct =
+          controller.products.firstWhere((p) => p.id == selectedId);
+          // update slip detail
           controller.onProductSelected(index, selectedProduct);
         }
       },
     );
   }
+
 
   Widget _buildTextField(List<TextEditingController> controllers, int index,
       double? value, Function(String) onChanged) {

@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../slip.dart';
-import '../slip_details.dart';
-import '../new_slip_controller.dart';  // Reuse your NewSlipController or create a dedicated one
-import '../master/api_service.dart';
+
+
+
 
 class SlipViewPage extends StatelessWidget {
   final Slip slip = Get.arguments as Slip;  // Pass Slip via navigation
 
-  // Optionally, you can create a controller here if your UX requires editing capability:
-  final NewSlipController controller = Get.put(NewSlipController());
 
-  SlipViewPage({Key? key}) : super(key: key) {
+  // Optionally, you can create a controller here if your UX requires editing capability:
+  //final NewSlipController controller = Get.find<NewSlipController>();
+  //Get.lazyPut(() =
+  // ✅ Find or create controller safely
+  // final NewSlipController controller = Get.put(
+  //   NewSlipController(),
+  //   //tag: slip.slipNumber, // optional tag to differentiate instances
+  // );
+
+
+
+  SlipViewPage({super.key}) {
     // Initialize controller's state from slip (for editing purposes)
-    controller.slipDate.value = slip.slipDate;
-    controller.slipNumber.value = slip.slipNumber;
-    controller.selectedClient.value = controller.clients.firstWhereOrNull((c) => c.id == slip.clientId);
-    controller.selectedSalesman.value = controller.salesmen.firstWhereOrNull((s) => s.id == slip.salesmanId);
-    controller.vehicleNumberController.text = slip.vehicleNumber ?? '';
-    controller.totalAmount.value = slip.totalAmount;
-    controller.slipDetails.assignAll(slip.slipDetails);
+    // controller.slipDate.value = slip.slipDate;
+    // controller.slipNumber.value = slip.slipNumber;
+    // controller.selectedClient.value = controller.clients.firstWhereOrNull((c) => c.id == slip.clientId);
+    // controller.selectedSalesman.value = controller.salesmen.firstWhereOrNull((s) => s.id == slip.salesmanId);
+    // controller.vehicleNumberController.text = slip.vehicleNumber ?? '';
+    // controller.totalAmount.value = slip.totalAmount;
+    // controller.slipDetails.assignAll(slip.slipDetails);
   }
 
   @override
@@ -66,6 +75,8 @@ class SlipViewPage extends StatelessWidget {
         Text('Salesman ID: ${slip.salesman?.name}', style: TextStyle(fontSize: 16)),
         SizedBox(height: 8),
         Text('Vehicle Number: ${slip.vehicleNumber ?? "N/A"}', style: TextStyle(fontSize: 16)),
+        SizedBox(height: 8),
+        Text('Transport Charges: ${slip.transportCharges ?? "N/A"}', style: TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -141,9 +152,14 @@ class SlipViewPage extends StatelessWidget {
   }
 
   void _onEdit() {
+    print(slip.transportCharges);
+    print("--------");
+    print(slip);
     // Navigate to your existing NewSlipPage in edit mode, passing the slip
     // You may want to modify NewSlipController to support editing mode
-    Get.toNamed('/edit-slip', arguments: slip);
+    Get.toNamed('/new-slip', arguments: slip);
+
+
   }
 
   void _onPrint() {

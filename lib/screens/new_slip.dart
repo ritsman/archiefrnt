@@ -6,7 +6,8 @@ import 'slip_details_section.dart'; // defined below
 import 'master/salesman.dart';
 
 class NewSlipPage extends StatelessWidget {
-  final NewSlipController controller = Get.put(NewSlipController());
+  //final NewSlipController controller = Get.put(NewSlipController());
+  final NewSlipController controller = Get.find<NewSlipController>();
 
    NewSlipPage({super.key});
 
@@ -74,14 +75,14 @@ class NewSlipPage extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Obx(() => TextFormField(
+              child:TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Slip Number',
                   border: OutlineInputBorder(),
                 ),
                 readOnly: true,
-                controller: TextEditingController(text: controller.slipNumber.value),
-              )),
+                controller: controller.slipNumberController,
+              ),
             ),
           ],
         ),
@@ -158,22 +159,17 @@ class NewSlipPage extends StatelessWidget {
 
             // Transport Charges
             Expanded(
-              child: Obx(() => TextFormField(
+              child: TextFormField(
+
                 decoration: const InputDecoration(
                   labelText: 'Transport Charges',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (val) {
-                  final parsed = double.tryParse(val) ?? 0.0;
-                  controller.transportCharges.value = parsed;
-                },
-                controller: TextEditingController(
-                  text: controller.transportCharges.value == 0.0
-                      ? ''
-                      : controller.transportCharges.value.toStringAsFixed(2),
-                ),
-              )),
+                controller: controller.transportChargesController,
+
+
+              ),
             ),
           ],
         ),
@@ -203,7 +199,7 @@ class NewSlipPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Obx(() => Text(
-          "Total Quantity: ${controller.totalQuantity.value}    Total Amount: ${controller.totalAmount.value.toStringAsFixed(2)}",
+          "Total Quantity: ${controller.totalQuantity.value.toStringAsFixed(2)}    Total Amount: ${controller.totalAmount.value.toStringAsFixed(2)}",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         )),
         SizedBox(height: 8),
@@ -211,11 +207,11 @@ class NewSlipPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Obx(() => ElevatedButton(
-              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(print: true),
+              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(shouldPrint: true),
               child: Text('Save'),
             )),
             Obx(() => ElevatedButton(
-              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(print: true),
+              onPressed: controller.isSaving.value ? null : () => controller.saveSlip(shouldPrint: true),
               child: Text('Save & Print'),
             )),
             ElevatedButton(

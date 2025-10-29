@@ -108,6 +108,6 @@ class Slip {
 
   @override
   String toString() {
-    return 'Slip(id: $id, slipNumber: $slipNumber, clientId: $clientId, salesmanId: $salesmanId, slipDate: $slipDate, vehicleNumber: $vehicleNumber, totalAmount: $totalAmount, slipDetails: $slipDetails)';
+    return 'Slip(id: $id, slipNumber: $slipNumber, clientId: $clientId, salesmanId: $salesmanId, slipDate: $slipDate, vehicleNumber: $vehicleNumber,transportCharges:$transportCharges, totalAmount: $totalAmount, slipDetails: $slipDetails)';
   }
 }

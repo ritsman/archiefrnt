@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_colors.dart';
 import '../widgets/drawer.dart';
 import '../widgets/card.dart';
+import 'new_slip_binding.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 

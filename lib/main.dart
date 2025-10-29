@@ -3,6 +3,7 @@ import 'package:container/screens/dispatch/dispatch_screen.dart';
 import 'package:container/screens/master/client_page.dart';
 
 import 'package:container/screens/master/product_page.dart';
+import 'package:container/screens/new_slip_binding.dart';
 import 'package:container/screens/payments/payments_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,13 +32,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Business App',
       theme: AppTheme.lightTheme,
-      initialRoute: '/',
+      initialRoute: '/home',
       getPages: [
         GetPage(name: '/', page: () => LoginScreen()),
         GetPage(name: '/home', page: () => HomeScreen()),
         GetPage(name: '/dispatch', page: () => DispatchScreen()),
         GetPage(name: '/reports', page: () => ReportsScreen()),
-        GetPage(name: '/new-slip', page: () => NewSlipPage()),
+        GetPage(name: '/new-slip', page: () => NewSlipPage(),binding: NewSlipBinding(),),
         GetPage(name: '/payments', page: () => PaymentsScreen()),
         GetPage(name: '/master', page: () => MasterScreen()),
         GetPage(name: '/master/salesman', page: () => SalesmanGridPage()),

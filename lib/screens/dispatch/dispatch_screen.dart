@@ -36,6 +36,7 @@ class DispatchScreen extends StatelessWidget {
                     Text("Amount: ₹${slip.totalAmount.toStringAsFixed(2)}"),
                     if (slip.vehicleNumber != null && slip.vehicleNumber!.isNotEmpty)
                       Text("Vehicle: ${slip.vehicleNumber}"),
+
                   ],
                 ),
                 trailing: Row(
